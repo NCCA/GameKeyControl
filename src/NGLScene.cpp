@@ -111,11 +111,11 @@ void NGLScene::initializeGL()
   // transformations
   ngl::Mat4 iv=m_cam->getViewMatrix();
   iv.transpose();
-  m_light = new ngl::Light(ngl::Vec3(0,0,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::DIRECTIONALLIGHT);
+  m_light = new ngl::Light(ngl::Vec3(0,0,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::DIRECTIONALLIGHT);
   m_light->setTransform(iv);
   // load these values to the shader as well
   m_light->loadToShader("light");
-  ngl::Material m(ngl::GOLD);
+  ngl::Material m(ngl::STDMAT::GOLD);
   m.loadToShader("material");
   // create our spaceship
   m_ship= new SpaceShip(ngl::Vec3(0,0,0),"models/SpaceShip.obj");
