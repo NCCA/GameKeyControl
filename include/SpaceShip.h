@@ -23,7 +23,7 @@ class SpaceShip
     /// @brief the position of the ship
     ngl::Vec3 m_pos;
     /// @brief the ship's mesh
-    ngl::Obj *m_mesh;
+    std::unique_ptr<ngl::Obj>m_mesh;
     /// @brief ship movement increment
     const static float s_increment;
     /// @brief a transform stack

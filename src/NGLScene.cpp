@@ -46,16 +46,14 @@ NGLScene::NGLScene()
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-  delete m_light;
 }
 
-void NGLScene::resizeGL(int _w, int _h)
+void NGLScene::resizeGL(QResizeEvent *_event)
 {
-  // set the viewport for openGL
-  glViewport(0,0,_w,_h);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)_w/_h,0.05f,350.0f);
-  update();
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
 
@@ -101,36 +99,31 @@ void NGLScene::initializeGL()
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
   // now load to our new camera
-  m_cam= new ngl::Camera(from,to,up);
+  m_cam.set(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam->setShape(45,(float)720.0/576.0,0.05,350);
-  shader->setShaderParam3f("viewerPos",m_cam->getEye().m_x,m_cam->getEye().m_y,m_cam->getEye().m_z);
+  m_cam.setShape(45,(float)720.0/576.0,0.05,350);
+  shader->setShaderParam3f("viewerPos",m_cam.getEye().m_x,m_cam.getEye().m_y,m_cam.getEye().m_z);
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
-  ngl::Mat4 iv=m_cam->getViewMatrix();
+  ngl::Mat4 iv=m_cam.getViewMatrix();
   iv.transpose();
-  m_light = new ngl::Light(ngl::Vec3(0,0,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::DIRECTIONALLIGHT);
-  m_light->setTransform(iv);
+  ngl::Light light(ngl::Vec3(0,0,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::DIRECTIONALLIGHT);
+  light.setTransform(iv);
   // load these values to the shader as well
-  m_light->loadToShader("light");
+  light.loadToShader("light");
   ngl::Material m(ngl::STDMAT::GOLD);
   m.loadToShader("material");
   // create our spaceship
-  m_ship= new SpaceShip(ngl::Vec3(0,0,0),"models/SpaceShip.obj");
-  // as re-size is not explicitly called we need to do this.
-  glViewport(0,0,width(),height());
-
+  m_ship.reset( new SpaceShip(ngl::Vec3(0,0,0),"models/SpaceShip.obj"));
 }
 
 
 void NGLScene::loadMatricesToShader()
 {
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-
-  ngl::Mat4 MVP=m_cam->getVPMatrix()  ;
-
+  ngl::Mat4 MVP=m_cam.getVPMatrix()  ;
   shader->setShaderParamFromMat4("MVP",MVP);
  }
 
@@ -139,7 +132,7 @@ void NGLScene::paintGL()
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // now load these values to the shader
-  m_ship->draw("Phong",m_cam);
+  m_ship->draw("Phong",&m_cam);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

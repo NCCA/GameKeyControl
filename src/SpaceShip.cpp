@@ -4,7 +4,7 @@
 SpaceShip::SpaceShip( ngl::Vec3 _pos, std::string _fname )
  {
    m_pos=_pos;
-   m_mesh = new ngl::Obj(_fname);
+   m_mesh.reset( new ngl::Obj(_fname));
    m_mesh->createVAO();
 	 m_rotation=0;
  }
