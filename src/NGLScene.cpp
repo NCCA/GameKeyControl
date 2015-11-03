@@ -11,7 +11,7 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
 
-const static float s_shipUpdate=0.2;
+constexpr static float s_shipUpdate=0.2;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,6 +56,12 @@ void NGLScene::resizeGL(QResizeEvent *_event)
   m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
+void NGLScene::resizeGL(int _w , int _h)
+{
+  m_cam.setShape(45.0f,(float)_w/_h,0.05f,350.0f);
+  m_width=_w*devicePixelRatio();
+  m_height=_h*devicePixelRatio();
+}
 
 void NGLScene::initializeGL()
 {
