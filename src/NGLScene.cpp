@@ -90,7 +90,7 @@ void NGLScene::initializeGL()
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
   m_cam.setShape(45,(float)720.0/576.0,0.05,350);
-  shader->setShaderParam3f("viewerPos",m_cam.getEye().m_x,m_cam.getEye().m_y,m_cam.getEye().m_z);
+  shader->setUniform("viewerPos",m_cam.getEye().toVec3());
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
@@ -111,7 +111,7 @@ void NGLScene::loadMatricesToShader()
 {
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   ngl::Mat4 MVP=m_cam.getVPMatrix()  ;
-  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setUniform("MVP",MVP);
  }
 
 void NGLScene::paintGL()
