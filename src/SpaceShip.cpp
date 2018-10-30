@@ -9,14 +9,14 @@ SpaceShip::SpaceShip( ngl::Vec3 _pos, std::string _fname )
 	 m_rotation=0;
  }
 
-void SpaceShip::draw(const std::string &_shader,  ngl::Camera *_cam )
+void SpaceShip::draw(const std::string &_shader,  const ngl::Mat4 &_view , const ngl::Mat4 &_project)
 {
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   (*shader)[_shader]->use();
 
 	m_transform.setPosition(m_pos);
 	m_transform.setRotation(0,m_rotation,0);
-  ngl::Mat4 MVP= _cam->getVPMatrix()*m_transform.getMatrix()  ;
+  ngl::Mat4 MVP= _project*_view*m_transform.getMatrix()  ;
   shader->setUniform("MVP",MVP);
 
   m_mesh->draw();
