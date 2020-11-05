@@ -1,7 +1,6 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
 #include <QApplication>
-
 #include "NGLScene.h"
 #include <ngl/Transformation.h>
 #include <ngl/NGLInit.h>
@@ -42,47 +41,44 @@ void NGLScene::initializeGL()
 {
   // we must call this first before any other GL commands to load and link the
   // gl commands from the lib, if this is not done program will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initialize();
 
   glClearColor(0.0f,0.0f,0.0f,1.0f);			   // black Background
   // enable depth testing for drawing
   glEnable(GL_DEPTH_TEST);
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
-  // now to load the shader and set the values
-  // grab an instance of shader manager
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   // we are creating a shader called Phong
-  shader->createShaderProgram("Phong");
+  ngl::ShaderLib::createShaderProgram("Phong");
   // now we are going to create empty shaders for Frag and Vert
-  shader->attachShader("PhongVertex",ngl::ShaderType::VERTEX);
-  shader->attachShader("PhongFragment",ngl::ShaderType::FRAGMENT);
+  ngl::ShaderLib::attachShader("PhongVertex",ngl::ShaderType::VERTEX);
+  ngl::ShaderLib::attachShader("PhongFragment",ngl::ShaderType::FRAGMENT);
   // attach the source
-  shader->loadShaderSource("PhongVertex","shaders/PhongVertex.glsl");
-  shader->loadShaderSource("PhongFragment","shaders/PhongFragment.glsl");
+  ngl::ShaderLib::loadShaderSource("PhongVertex","shaders/PhongVertex.glsl");
+  ngl::ShaderLib::loadShaderSource("PhongFragment","shaders/PhongFragment.glsl");
   // compile the shaders
-  shader->compileShader("PhongVertex");
-  shader->compileShader("PhongFragment");
+  ngl::ShaderLib::compileShader("PhongVertex");
+  ngl::ShaderLib::compileShader("PhongFragment");
   // add them to the program
-  shader->attachShaderToProgram("Phong","PhongVertex");
-  shader->attachShaderToProgram("Phong","PhongFragment");
+  ngl::ShaderLib::attachShaderToProgram("Phong","PhongVertex");
+  ngl::ShaderLib::attachShaderToProgram("Phong","PhongFragment");
 
 
   // now we have associated this data we can link the shader
-  shader->linkProgramObject("Phong");
+  ngl::ShaderLib::linkProgramObject("Phong");
 
   // and make it active ready to load values
-  (*shader)["Phong"]->use();
+  ngl::ShaderLib::use("Phong");
   ngl::Vec4 lightPos(0.0f,0.0f,-2.0f,0.0f);
-  shader->setUniform("light.position",lightPos);
-  shader->setUniform("light.ambient",0.0f,0.0f,0.0f,1.0f);
-  shader->setUniform("light.diffuse",1.0f,1.0f,1.0f,1.0f);
-  shader->setUniform("light.specular",0.8f,0.8f,0.8f,1.0f);
+  ngl::ShaderLib::setUniform("light.position",lightPos);
+  ngl::ShaderLib::setUniform("light.ambient",0.0f,0.0f,0.0f,1.0f);
+  ngl::ShaderLib::setUniform("light.diffuse",1.0f,1.0f,1.0f,1.0f);
+  ngl::ShaderLib::setUniform("light.specular",0.8f,0.8f,0.8f,1.0f);
   // gold like phong material
-  shader->setUniform("material.ambient",0.274725f,0.1995f,0.0745f,0.0f);
-  shader->setUniform("material.diffuse",0.75164f,0.60648f,0.22648f,0.0f);
-  shader->setUniform("material.specular",0.628281f,0.555802f,0.3666065f,0.0f);
-  shader->setUniform("material.shininess",51.2f);
+  ngl::ShaderLib::setUniform("material.ambient",0.274725f,0.1995f,0.0745f,0.0f);
+  ngl::ShaderLib::setUniform("material.diffuse",0.75164f,0.60648f,0.22648f,0.0f);
+  ngl::ShaderLib::setUniform("material.specular",0.628281f,0.555802f,0.3666065f,0.0f);
+  ngl::ShaderLib::setUniform("material.shininess",51.2f);
 
   // Now we will create a basic Camera from the graphics library
   // This is a static camera so it only needs to be set once
@@ -95,17 +91,16 @@ void NGLScene::initializeGL()
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
   m_project=ngl::perspective(45,720.0f/576.0f,0.05f,350);
-  shader->setUniform("viewerPos",from);
+  ngl::ShaderLib::setUniform("viewerPos",from);
   // create our spaceship
-  m_ship.reset( new SpaceShip(ngl::Vec3(0,0,0),"models/SpaceShip.obj"));
+  m_ship= std::make_unique<SpaceShip>(ngl::Vec3(0,0,0),"models/SpaceShip.obj");
 }
 
 
 void NGLScene::loadMatricesToShader()
 {
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   ngl::Mat4 MVP=m_project*m_view  ;
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
  }
 
 void NGLScene::paintGL()

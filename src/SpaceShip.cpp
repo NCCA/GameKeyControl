@@ -11,14 +11,11 @@ SpaceShip::SpaceShip( ngl::Vec3 _pos, std::string _fname )
 
 void SpaceShip::draw(const std::string &_shader,  const ngl::Mat4 &_view , const ngl::Mat4 &_project)
 {
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)[_shader]->use();
-
+  ngl::ShaderLib::use(_shader);
 	m_transform.setPosition(m_pos);
 	m_transform.setRotation(0,m_rotation,0);
   ngl::Mat4 MVP= _project*_view*m_transform.getMatrix()  ;
-  shader->setUniform("MVP",MVP);
-
+  ngl::ShaderLib::setUniform("MVP",MVP);
   m_mesh->draw();
 }
 
