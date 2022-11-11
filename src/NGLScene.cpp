@@ -6,6 +6,7 @@
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
+#include <iostream>
 
 constexpr static float s_shipUpdate = 0.2f;
 
